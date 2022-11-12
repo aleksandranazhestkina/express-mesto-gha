@@ -2,10 +2,10 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -20,9 +20,8 @@ module.exports.getUserById = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -34,9 +33,8 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -51,9 +49,8 @@ module.exports.updateUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -68,8 +65,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };

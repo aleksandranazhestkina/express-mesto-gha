@@ -2,10 +2,10 @@ const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -16,9 +16,8 @@ module.exports.createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -34,9 +33,8 @@ module.exports.deleteCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -56,9 +54,8 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -78,8 +75,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные карточки.'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        next(err);
       }
-      next(err);
     });
 };
