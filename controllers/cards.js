@@ -10,7 +10,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  Card.create({ name, link, owner: req.user._id }, { new: true, runValidators: true })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -26,9 +26,9 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка с указанным _id не найдена.'));
+        return next(new NotFoundError('Карточка с указанным _id не найдена.'));
       }
-      res.status(200).send(card);
+      return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -46,14 +46,11 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(() => {
-      throw new NotFoundError('Карточка с указанным _id не найдена.');
-    })
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'));
+        return next(new NotFoundError('Kарточка с указанным _id не найдена.'));
       }
-      res.status(200).send(card);
+      return res.status(200).send({ card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -73,9 +70,9 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        next(new NotFoundError('Карточка не найдена'));
+        return next(new NotFoundError('Карточка не найдена'));
       }
-      res.status(200).send(card);
+      return res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
