@@ -25,12 +25,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-});
-app.use(helmet());
-app.disable('x-powered-by');
-
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -43,6 +37,12 @@ app.use(limiter);
 
 app.use('/', routerUser);
 app.use('/', routerCard);
+
+app.use((req, res) => {
+  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+});
+app.use(helmet());
+app.disable('x-powered-by');
 app.use(errorHandler);
 
 app.listen(PORT);
