@@ -6,6 +6,6 @@ class UnauthorizedError extends Error {
     this.errorMessage = message;
     this.statusCode = ERROR_CODE_UNAUTHORIZED;
   }
-};
+}
 
 module.exports = UnauthorizedError;
