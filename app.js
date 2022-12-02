@@ -3,13 +3,13 @@ const { celebrate, Joi } = require('celebrate');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const errorHandler = require('./middlewares/errorHandler');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
-const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 
@@ -58,6 +58,7 @@ app.use((req, res) => {
 });
 app.use(helmet());
 app.disable('x-powered-by');
+
 app.use(errors());
 app.use(errorHandler);
 
