@@ -35,14 +35,14 @@ app.use('/', routerUser);
 app.use('/', routerCard);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
+    email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: false } }),
+    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
   }),
 }), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: false } }),
     password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),

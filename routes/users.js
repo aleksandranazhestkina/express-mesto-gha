@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const mongoose = require('mongoose');
 
 const {
   getUsers,
@@ -10,14 +11,21 @@ const {
 } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 
+const validateId = (value, helpers) => {
+  if (mongoose.isValidObjectId(value)) { return value; }
+  return helpers.error('any.invalid');
+};
+
 router.get('/users', auth, getUsers);
+
 router.get('/users/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().required().length(24).hex(),
+    userId: Joi.string().custom(validateId, 'ObjectId validation'),
   }),
 }), auth, getUserById);
 
 router.get('/users/me', auth, getUserInfo);
+
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
