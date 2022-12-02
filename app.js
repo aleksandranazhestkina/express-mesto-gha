@@ -1,4 +1,5 @@
 const express = require('express');
+const { celebrate, Joi } = require('celebrate');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
@@ -32,8 +33,22 @@ app.use(limiter);
 
 app.use('/', routerUser);
 app.use('/', routerCard);
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+  }),
+}), createUser);
 
 app.use(auth);
 
