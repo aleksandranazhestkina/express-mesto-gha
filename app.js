@@ -9,6 +9,7 @@ const routerCard = require('./routes/cards');
 const errorHandler = require('./middlewares/errorHandler');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 
@@ -57,6 +58,7 @@ app.use((req, res) => {
 });
 app.use(helmet());
 app.disable('x-powered-by');
+app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT);
