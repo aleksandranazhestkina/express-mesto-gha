@@ -7,6 +7,8 @@ const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCard = require('./routes/cards');
 const errorHandler = require('./middlewares/errorHandler');
+const NotFoundError = require('./errors/not-found-error');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 
@@ -31,11 +33,16 @@ app.use(limiter);
 
 app.use('/', routerUser);
 app.use('/', routerCard);
+app.use(auth);
 
 app.use(helmet());
 app.disable('x-powered-by');
 
 app.use(errors());
 app.use(errorHandler);
+
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Ресурс по указанному адресу не найден'));
+});
 
 app.listen(PORT);

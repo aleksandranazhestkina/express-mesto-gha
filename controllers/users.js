@@ -33,7 +33,7 @@ module.exports.getUserById = (req, res, next) => {
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if (!user) {
+      if (!user._id) {
         return next(new NotFoundError('Пользователь с таким id не найден.'));
       }
       return res.status(200).send(user);
@@ -110,7 +110,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-key', { expiresIn: '7d' });
-      res.status(201).send({ message: 'Авторизация успешна.', token });
+      res.status(200).send({ message: 'Авторизация успешна.', token });
     })
     .catch(next);
 };
