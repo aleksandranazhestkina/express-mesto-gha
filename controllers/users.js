@@ -6,6 +6,8 @@ const BadRequestError = require('../errors/bad-request-error');
 const UnauthorizedError = require('../errors/unauthorized-error');
 const ConflictError = require('../errors/conflict-error');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -108,14 +110,8 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-key', { expiresIn: '7d' });
       res.status(201).send({ message: 'Авторизация успешна.', token });
     })
-    .catch((err) => {
-      if (err.message === 'IncorrectEmail') {
-        next(new UnauthorizedError('Не правильный логин или пароль.'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
