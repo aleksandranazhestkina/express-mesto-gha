@@ -13,23 +13,6 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь с таким id не найден.'));
-      }
-      return res.status(200).send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-      } else {
-        next(err);
-      }
-    });
-};
-
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
@@ -41,6 +24,23 @@ module.exports.getUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
+      } else {
+        console.log('error');
+      }
+    });
+};
+
+module.exports.getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        return next(new NotFoundError('Пользователь с таким id не найден.'));
+      }
+      return res.status(200).send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
       } else {
         next(err);
       }
@@ -76,16 +76,20 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .orFail(() => {
-      throw new NotFoundError('Пользователь с указанным _id не найден.');
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь с указанным _id не найден.');
+      }
+      res.status(200).send(user);
     })
-    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
-      } else {
-        next(err);
       }
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Передан некорректный id.'));
+      }
+      next(err);
     });
 };
 

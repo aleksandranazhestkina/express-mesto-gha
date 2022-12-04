@@ -11,20 +11,14 @@ const {
   login,
   createUser,
 } = require('../controllers/users');
+const auth = require('../middlewares/auth');
 
 const validateId = (value, helpers) => {
   if (mongoose.isValidObjectId(value)) { return value; }
   return helpers.error('any.invalid');
 };
 
-router.get('/users', getUsers);
-
-router.get('/users/:userId', celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().custom(validateId, 'ObjectId validation'),
-  }),
-}), getUserById);
-
+router.get('/users', auth, getUsers);
 router.get('/users/me', getUserInfo);
 
 router.patch('/users/me', celebrate({
@@ -39,6 +33,12 @@ router.patch('/users/me/avatar', celebrate({
     avatar: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
   }),
 }), updateUserAvatar);
+
+router.get('/users/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().custom(validateId, 'ObjectId validation'),
+  }),
+}), getUserById);
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({

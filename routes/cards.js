@@ -8,6 +8,7 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
+// const auth = require('../middlewares/auth');
 
 router.get('/cards', getCards);
 
