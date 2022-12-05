@@ -28,7 +28,8 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card.owner.equals(req.user._id)) {
         next(new ForbiddenError('Попытка удалить чужую карточку.'));
-      } return card.remove();
+      }
+      return card.remove();
     })
     .catch((err) => {
       if (err.name === 'CastError') {
