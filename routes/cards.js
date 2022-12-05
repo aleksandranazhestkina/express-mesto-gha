@@ -8,9 +8,9 @@ const {
   dislikeCard,
 } = require('../controllers/cards');
 const { validateCardId, validateCreateCard } = require('../middlewares/validation');
-// const auth = require('../middlewares/auth');
+const auth = require('../middlewares/auth');
 
-// router.use(auth);
+router.use(auth);
 
 router.get('/cards', getCards);
 router.post('/cards', validateCreateCard, createCard);
