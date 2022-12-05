@@ -29,7 +29,13 @@ module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => next(new NotFoundError('Пользователь c указанным _id не найден.')))
     .then((user) => res.send(user))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Передан некорректный _id пользователя.'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -46,7 +52,7 @@ module.exports.updateUser = (req, res, next) => {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
       }
       if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный _id.'));
+        next(new BadRequestError('Передан некорректный _id пользователя.'));
       }
       next(err);
     });
@@ -60,6 +66,9 @@ module.exports.updateUserAvatar = (req, res, next) => {
     })
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Передан некорректный _id пользователя.'));
+      }
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении аватара.'));
       } else {
