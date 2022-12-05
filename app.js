@@ -4,22 +4,10 @@ const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
-const routerUser = require('./routes/users');
-const routerCard = require('./routes/cards');
 const errorHandler = require('./middlewares/errorHandler');
-const NotFoundError = require('./errors/not-found-error');
-const auth = require('./middlewares/auth');
+const router = require('./routes/routes');
 
 const { PORT = 3000 } = process.env;
-
-const app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-});
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -28,21 +16,19 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-// Apply the rate limiting middleware to all requests
-app.use(limiter);
-
-app.use('/', routerUser);
-app.use('/', routerCard);
-app.use(auth);
+const app = express();
 
 app.use(helmet());
-app.disable('x-powered-by');
+app.use(limiter);
+
+app.use(bodyParser.json());
+app.use(router);
 
 app.use(errors());
 app.use(errorHandler);
 
-app.use('*', (req, res, next) => {
-  next(new NotFoundError('Ресурс по указанному адресу не найден'));
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
 });
 
 app.listen(PORT);
