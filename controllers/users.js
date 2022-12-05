@@ -1,3 +1,4 @@
+const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -5,25 +6,19 @@ const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 const ConflictError = require('../errors/conflict-error');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
-
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь с таким id не найден.'));
-      }
-      return res.status(200).send({ data: user });
-    })
+    .orFail(() => next(new NotFoundError('Пользователь c указанным _id не найден.')))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+        next(new BadRequestError('Передан некорректный _id пользователя.'));
       } else {
         next(err);
       }
@@ -32,7 +27,7 @@ module.exports.getUserById = (req, res, next) => {
 
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(() => next(new NotFoundError('Пользователь по указанному _id не найден.')))
+    .orFail(() => next(new NotFoundError('Пользователь c указанным _id не найден.')))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -51,7 +46,7 @@ module.exports.updateUser = (req, res, next) => {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля.'));
       }
       if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный id.'));
+        next(new BadRequestError('Передан некорректный _id.'));
       }
       next(err);
     });
