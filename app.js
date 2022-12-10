@@ -1,4 +1,5 @@
 const express = require('express');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
@@ -21,8 +22,12 @@ const app = express();
 app.use(helmet());
 app.use(limiter);
 
+app.use(requestLogger); // подключаем логгер запросов
+
 app.use(bodyParser.json());
 app.use(router);
+
+app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
