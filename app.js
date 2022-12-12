@@ -9,7 +9,7 @@ const router = require('./routes/routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -20,7 +20,7 @@ const limiter = rateLimit({
 
 const options = {
   origin: [
-    'http://localhost:3000',
+    'http://localhost:3001',
     'https://api.nazhestkina.nomoredomains.club',
     'https://github.com/aleksandranazhestkina/express-mesto-gha.git',
   ],
