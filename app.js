@@ -20,7 +20,7 @@ const limiter = rateLimit({
 
 const options = {
   origin: [
-    'http://localhost:3001',
+    'http://localhost:3000',
     'https://api.nazhestkina.nomoredomains.club',
     'https://github.com/aleksandranazhestkina/express-mesto-gha.git',
   ],
