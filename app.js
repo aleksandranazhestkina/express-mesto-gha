@@ -1,12 +1,13 @@
 const express = require('express');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const bodyParser = require('body-parser');
-const errorHandler = require('./middlewares/errorHandler');
 const router = require('./routes/routes');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
 
@@ -17,8 +18,22 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+const options = {
+  origin: [
+    'http://localhost:3000',
+    'https://api.nazhestkina.nomoredomains.club',
+    'https://github.com/aleksandranazhestkina/express-mesto-gha.git',
+  ],
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  credentials: true,
+};
+
 const app = express();
 
+app.use('*', cors(options));
 app.use(helmet());
 app.use(limiter);
 
