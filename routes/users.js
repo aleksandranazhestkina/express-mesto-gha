@@ -11,6 +11,7 @@ const { validateUpdateUser, validateUpdateUserAvatar, validateGetUserById } = re
 const auth = require('../middlewares/auth');
 
 router.use(auth);
+
 router.get('/users', getUsers);
 router.get('/users/me', getUserInfo);
 router.patch('/users/me', validateUpdateUser, updateUser);
