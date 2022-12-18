@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const router = require('./routes/routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-// const errorHandler = require('./middlewares/errorHandler');
+const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3001 } = process.env;
 
@@ -45,7 +45,7 @@ app.use(router);
 app.use(errorLogger);
 
 app.use(errors());
-// app.use(errorHandler);
+app.use(errorHandler);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
