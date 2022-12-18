@@ -18,22 +18,22 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
-const options = {
-  origin: [
-    'http://localhost:3000',
-    'https://api.nazhestkina.nomoredomains.club',
-    'https://github.com/aleksandranazhestkina/express-mesto-gha.git',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-};
+// const options = {
+//   origin: [
+//     'http://localhost:3000',
+//     'https://api.nazhestkina.nomoredomains.club',
+//     'https://github.com/aleksandranazhestkina/express-mesto-gha.git',
+//   ],
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204,
+//   allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+//   credentials: true,
+// };
 
 const app = express();
 
-app.use('*', cors(options));
+app.use('*', cors());
 app.use(helmet());
 app.use(limiter);
 
@@ -45,7 +45,7 @@ app.use(router);
 app.use(errorLogger);
 
 app.use(errors());
-app.use(errorHandler);
+//app.use(errorHandler);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
